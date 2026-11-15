@@ -1,0 +1,1338 @@
+{
+  "wheel": "Concepts",
+  "status": "draft",
+  "listHeadings": {
+    "showsUp": "Where it shows up",
+    "tradeoffs": "Trade-offs and gotchas"
+  },
+  "fields": [
+    {
+      "name": "Frontend",
+      "definition": "The code that runs on the user's device and turns data into an interface they can see and use.",
+      "showsUp": [
+        "Browsers, mobile web views and desktop shells.",
+        "Anywhere latency is felt directly by a person."
+      ],
+      "tradeoffs": [
+        "You do not control the device, the network or the browser version.",
+        "Every byte you ship is paid for by the user."
+      ],
+      "areas": [
+        {
+          "name": "Rendering",
+          "definition": "How markup, styles and data become pixels, and where that work happens: server, build step or browser.",
+          "showsUp": [
+            "Choosing between server-rendered, static and client-rendered pages.",
+            "Debugging a page that flashes or shifts as it loads."
+          ],
+          "tradeoffs": [
+            "Rendering earlier improves first paint but can delay interactivity.",
+            "Mixing strategies per route adds mental overhead."
+          ],
+          "terms": [
+            {
+              "name": "Hydration",
+              "definition": "Attaching event handlers and state to server-rendered HTML so a static page becomes interactive.",
+              "showsUp": [
+                "Server-rendered React, Vue and Svelte apps.",
+                "The gap where a button is visible but does nothing yet."
+              ],
+              "tradeoffs": [
+                "The browser re-runs component code it already received as HTML.",
+                "Server and client output must match, or you get mismatch errors."
+              ]
+            },
+            {
+              "name": "Virtual DOM",
+              "definition": "An in-memory tree describing the UI, diffed against the previous one to work out the smallest real DOM update.",
+              "showsUp": [
+                "React and similar libraries on every state change.",
+                "List rendering, where keys tell the diff which items moved."
+              ],
+              "tradeoffs": [
+                "Diffing is work in itself; it is convenient, not free.",
+                "Unstable keys cause lost input state and needless re-renders."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "State",
+          "definition": "The data an interface remembers between renders, and the rules for who may read and change it.",
+          "showsUp": [
+            "Form inputs, open menus, fetched data and the current URL.",
+            "Bugs where two parts of the screen disagree."
+          ],
+          "tradeoffs": [
+            "Global state is easy to reach and hard to reason about.",
+            "Copying server data into client state creates a second source of truth."
+          ],
+          "terms": [
+            {
+              "name": "Reactivity",
+              "definition": "A system that tracks which code depends on which data and re-runs only that code when the data changes.",
+              "showsUp": [
+                "Signals in Solid, Vue refs and Svelte runes.",
+                "Spreadsheet-style derived values that stay in sync."
+              ],
+              "tradeoffs": [
+                "Dependencies are tracked implicitly, so a missed read means a stale UI.",
+                "Chains of derived values can be hard to trace when something updates unexpectedly."
+              ]
+            },
+            {
+              "name": "Stores",
+              "definition": "A shared container for state that lives outside any one component and notifies subscribers when it changes.",
+              "showsUp": [
+                "Redux, Zustand and Pinia.",
+                "Auth status, carts and other data many screens need."
+              ],
+              "tradeoffs": [
+                "Everything subscribed re-renders unless you select narrowly.",
+                "It is tempting to put local state there, which couples unrelated screens."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Styling",
+          "definition": "How visual rules are written, scoped and kept consistent across an interface.",
+          "showsUp": [
+            "CSS files, utility classes and component-scoped styles.",
+            "Theming, dark mode and responsive layout."
+          ],
+          "tradeoffs": [
+            "Unscoped styles leak; fully scoped styles are harder to theme.",
+            "Runtime styling libraries cost render time."
+          ],
+          "terms": [
+            {
+              "name": "Cascade",
+              "definition": "The algorithm CSS uses to decide which declaration wins when several target the same element.",
+              "showsUp": [
+                "Specificity fights that end in !important.",
+                "Cascade layers, which let you order whole stylesheets explicitly."
+              ],
+              "tradeoffs": [
+                "Source order matters, so bundling changes can change the result.",
+                "Raising specificity to win once makes the next override harder."
+              ]
+            },
+            {
+              "name": "Design tokens",
+              "definition": "Named values for colour, spacing, type and motion that act as the single source for a visual system.",
+              "showsUp": [
+                "CSS custom properties and theme files.",
+                "Hand-off between design tools and code."
+              ],
+              "tradeoffs": [
+                "Tokens named after appearance (blue-500) resist theming; names by role (surface, accent) survive it.",
+                "Too many tokens recreate the inconsistency they were meant to remove."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Performance",
+          "definition": "How quickly an interface loads, responds to input and stays visually stable on real devices.",
+          "showsUp": [
+            "Bundle budgets and lab or field measurements.",
+            "Conversion and retention numbers."
+          ],
+          "tradeoffs": [
+            "A fast developer laptop hides problems a mid-range phone will show.",
+            "Optimising a metric is not the same as improving the experience."
+          ],
+          "terms": [
+            {
+              "name": "Code splitting",
+              "definition": "Breaking a JavaScript bundle into chunks that load only when the route or feature that needs them is used.",
+              "showsUp": [
+                "Dynamic import() and route-level lazy loading.",
+                "Heavy editors, charts or maps loaded on demand."
+              ],
+              "tradeoffs": [
+                "Each split adds a network round trip at the moment of use.",
+                "Too many small chunks can be slower than one medium one."
+              ]
+            },
+            {
+              "name": "Core Web Vitals",
+              "definition": "Google's field metrics for loading (LCP), responsiveness (INP) and visual stability (CLS).",
+              "showsUp": [
+                "Search ranking signals and performance dashboards.",
+                "Real-user monitoring, split by device and connection."
+              ],
+              "tradeoffs": [
+                "Lab scores and field data often disagree; field data is what counts.",
+                "The 75th percentile hides your slowest users."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Backend",
+      "definition": "The code that runs on machines you control, owning business rules, data access and communication with other systems.",
+      "showsUp": [
+        "Request handlers, background workers and scheduled jobs.",
+        "Any rule that must hold no matter which client calls it."
+      ],
+      "tradeoffs": [
+        "It is the last line of defence, so it cannot trust any client.",
+        "Its failures are shared by every user at once."
+      ],
+      "areas": [
+        {
+          "name": "APIs",
+          "definition": "The contract a service exposes so other programs can call it without knowing how it works inside.",
+          "showsUp": [
+            "Between frontend and backend, and between services.",
+            "Public integrations for partners and customers."
+          ],
+          "tradeoffs": [
+            "Once published, a contract is expensive to change.",
+            "An API shaped around your database leaks your internals."
+          ],
+          "terms": [
+            {
+              "name": "REST",
+              "definition": "An API style that models a system as resources addressed by URLs and manipulated with standard HTTP methods.",
+              "showsUp": [
+                "Most public web APIs.",
+                "Anywhere HTTP caching and status codes carry meaning."
+              ],
+              "tradeoffs": [
+                "Clients often over-fetch, or need several round trips for one screen.",
+                "Operations that are not create, read, update or delete fit awkwardly."
+              ]
+            },
+            {
+              "name": "GraphQL",
+              "definition": "A query language where the client specifies exactly which fields it wants from a typed schema, in one request.",
+              "showsUp": [
+                "Apps with many screens reading overlapping data.",
+                "A gateway in front of several backend services."
+              ],
+              "tradeoffs": [
+                "Naive resolvers produce N+1 queries; batching is required.",
+                "HTTP caching and rate limiting need extra design."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Auth",
+          "definition": "Establishing who a caller is (authentication) and what they are allowed to do (authorisation).",
+          "showsUp": [
+            "Login flows, API keys and service-to-service calls.",
+            "Every endpoint that returns someone's data."
+          ],
+          "tradeoffs": [
+            "Authentication without per-resource authorisation is the commonest serious bug.",
+            "Building your own is rarely worth the risk."
+          ],
+          "terms": [
+            {
+              "name": "OAuth",
+              "definition": "A protocol that lets a user grant an application limited access to their account without sharing a password.",
+              "showsUp": [
+                "Sign in with Google or GitHub buttons.",
+                "Third-party apps acting on a user's behalf."
+              ],
+              "tradeoffs": [
+                "It is delegation, not identity; OpenID Connect adds the identity layer.",
+                "Flow choice matters: the wrong one for a public client leaks tokens."
+              ]
+            },
+            {
+              "name": "Sessions",
+              "definition": "Server-held state tied to an opaque identifier, usually in a cookie, that remembers a logged-in user between requests.",
+              "showsUp": [
+                "Traditional web apps and many modern ones.",
+                "The alternative people weigh against stateless tokens."
+              ],
+              "tradeoffs": [
+                "Needs a shared store once you run more than one server.",
+                "Easy to revoke, which self-contained tokens are not."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Concurrency",
+          "definition": "Making progress on several tasks in overlapping time, whether or not they run at the same instant.",
+          "showsUp": [
+            "Servers handling many requests at once.",
+            "Any code path that waits on a network or disk."
+          ],
+          "tradeoffs": [
+            "Shared mutable state is where the bugs live.",
+            "Failures are timing-dependent and hard to reproduce."
+          ],
+          "terms": [
+            {
+              "name": "Event loop",
+              "definition": "A single thread that repeatedly takes ready tasks from a queue and runs each to completion, never blocking on I/O.",
+              "showsUp": [
+                "Node.js, browsers and Python's asyncio.",
+                "Services that are mostly waiting on other services."
+              ],
+              "tradeoffs": [
+                "One CPU-heavy task stalls every other request.",
+                "Forgotten awaits fail silently or out of order."
+              ]
+            },
+            {
+              "name": "Threads",
+              "definition": "Independent paths of execution within one process that share memory and can run in parallel on multiple cores.",
+              "showsUp": [
+                "Java, Go and Rust servers; worker pools.",
+                "CPU-bound work such as image processing."
+              ],
+              "tradeoffs": [
+                "Shared memory needs locks, which bring deadlocks and contention.",
+                "Each thread has a memory cost, so thousands of idle ones add up."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Messaging",
+          "definition": "Passing work or notifications between systems without the sender waiting for the receiver to finish.",
+          "showsUp": [
+            "Background jobs, emails and integrations.",
+            "Decoupling services that scale at different rates."
+          ],
+          "tradeoffs": [
+            "You trade immediate errors for delayed, harder-to-see ones.",
+            "Delivery is usually at-least-once, so duplicates are normal."
+          ],
+          "terms": [
+            {
+              "name": "Queues",
+              "definition": "A buffer that holds messages until a consumer is ready, smoothing bursts and letting work survive restarts.",
+              "showsUp": [
+                "SQS, RabbitMQ and Redis-backed job runners.",
+                "Anything slow moved out of the request path."
+              ],
+              "tradeoffs": [
+                "Ordering is often not guaranteed unless you pay for it.",
+                "A poison message can block or loop without a dead-letter queue."
+              ]
+            },
+            {
+              "name": "Webhooks",
+              "definition": "An HTTP request a service sends to your URL when something happens, so you do not have to poll for changes.",
+              "showsUp": [
+                "Payment, source control and messaging platforms.",
+                "Triggering pipelines from external events."
+              ],
+              "tradeoffs": [
+                "They arrive late, twice or out of order; handlers must cope.",
+                "You must verify the signature, or anyone can post fake events."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Data",
+      "definition": "How information is stored, shaped, moved and kept correct over the life of a system.",
+      "showsUp": [
+        "Databases, warehouses, caches and files.",
+        "Most outages and most migrations."
+      ],
+      "tradeoffs": [
+        "Data outlives the code that wrote it.",
+        "Mistakes here are the hardest to undo."
+      ],
+      "areas": [
+        {
+          "name": "Storage",
+          "definition": "The engines that persist data and the guarantees they make about reading it back.",
+          "showsUp": [
+            "Choosing a database and tuning queries.",
+            "Backups, replication and recovery."
+          ],
+          "tradeoffs": [
+            "Stronger guarantees usually cost throughput or availability.",
+            "The access pattern, not the data size, should drive the choice."
+          ],
+          "terms": [
+            {
+              "name": "Indexes",
+              "definition": "An auxiliary structure, usually a B-tree, that lets the database find rows without scanning the whole table.",
+              "showsUp": [
+                "WHERE, JOIN and ORDER BY on large tables.",
+                "Query plans that switch from scan to seek."
+              ],
+              "tradeoffs": [
+                "Every index slows writes and takes space.",
+                "Column order in a composite index decides which queries can use it."
+              ]
+            },
+            {
+              "name": "Transactions",
+              "definition": "A group of operations the database treats as one unit: all take effect or none do.",
+              "showsUp": [
+                "Moving money, placing orders, anything multi-step.",
+                "Isolation levels that decide what concurrent readers see."
+              ],
+              "tradeoffs": [
+                "Long transactions hold locks and block others.",
+                "The default isolation level permits anomalies many developers assume are impossible."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Modelling",
+          "definition": "Deciding what entities exist, how they relate and what shape their records take.",
+          "showsUp": [
+            "The first schema and every migration after it.",
+            "API shapes, which tend to mirror the model."
+          ],
+          "tradeoffs": [
+            "A model tuned for writing is rarely ideal for reading.",
+            "Early modelling mistakes compound with every feature."
+          ],
+          "terms": [
+            {
+              "name": "Normalisation",
+              "definition": "Organising tables so each fact is stored once, removing redundancy and the update anomalies it causes.",
+              "showsUp": [
+                "Relational schema design.",
+                "Deciding whether to copy a customer name onto each order."
+              ],
+              "tradeoffs": [
+                "More joins at read time.",
+                "Deliberate denormalisation is fine; accidental duplication is not."
+              ]
+            },
+            {
+              "name": "Schemas",
+              "definition": "A formal description of the structure and types data must follow, enforced by a database or a validator.",
+              "showsUp": [
+                "Table definitions, JSON Schema, Protobuf and Avro.",
+                "Contracts between producers and consumers of events."
+              ],
+              "tradeoffs": [
+                "Schemaless stores still have a schema; it just lives in application code.",
+                "Changes must stay compatible while old and new code run together."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Pipelines",
+          "definition": "Automated flows that move data from where it is produced to where it is analysed or served.",
+          "showsUp": [
+            "Analytics, reporting and machine-learning features.",
+            "Syncing operational data into search or a warehouse."
+          ],
+          "tradeoffs": [
+            "Silent data errors are worse than crashes.",
+            "Reprocessing history must be possible, so steps should be repeatable."
+          ],
+          "terms": [
+            {
+              "name": "ETL",
+              "definition": "Extract, transform, load: pulling data from sources, reshaping it and writing it to a destination, typically in batches.",
+              "showsUp": [
+                "Nightly warehouse loads.",
+                "Its variant ELT, which loads raw data first and transforms in the warehouse."
+              ],
+              "tradeoffs": [
+                "Results are only as fresh as the last run.",
+                "Upstream schema changes break jobs without warning."
+              ]
+            },
+            {
+              "name": "Streaming",
+              "definition": "Processing records continuously as they arrive, instead of waiting to collect them into batches.",
+              "showsUp": [
+                "Kafka, Kinesis and Flink.",
+                "Fraud checks, live dashboards and change data capture."
+              ],
+              "tradeoffs": [
+                "Late and out-of-order events force you to reason about time explicitly.",
+                "Operationally heavier than batch; use it when freshness pays for it."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Caching",
+          "definition": "Keeping a copy of an expensive result closer to where it is needed, so repeat requests are cheaper.",
+          "showsUp": [
+            "CDNs, Redis, in-process memoisation and HTTP headers.",
+            "In front of slow queries and rate-limited APIs."
+          ],
+          "tradeoffs": [
+            "You accept some staleness in exchange for speed.",
+            "A cache that hides a slow system makes its outage worse."
+          ],
+          "terms": [
+            {
+              "name": "Invalidation",
+              "definition": "Removing or updating cached entries when the underlying data changes, so readers stop seeing stale values.",
+              "showsUp": [
+                "Purging a CDN after a deploy.",
+                "Deleting a cache key after a write."
+              ],
+              "tradeoffs": [
+                "Knowing every key affected by a change is the hard part.",
+                "Races between a write and a concurrent refill can re-cache old data."
+              ]
+            },
+            {
+              "name": "TTL",
+              "definition": "Time to live: how long a cached entry is considered fresh before it expires and must be fetched again.",
+              "showsUp": [
+                "DNS records, Cache-Control max-age and Redis EXPIRE.",
+                "The simplest invalidation strategy available."
+              ],
+              "tradeoffs": [
+                "Too short wastes the cache; too long serves stale data.",
+                "Many keys expiring together cause a stampede on the origin."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "definition": "Systems whose behaviour is learned from data instead of written as explicit rules.",
+      "showsUp": [
+        "Search, recommendations, assistants and code tools.",
+        "Features where exact rules are impractical to write."
+      ],
+      "tradeoffs": [
+        "Outputs are probabilistic, so testing means measuring, not asserting.",
+        "Cost and latency scale with usage in ways ordinary code does not."
+      ],
+      "areas": [
+        {
+          "name": "Models",
+          "definition": "The learned functions themselves: their architecture, what they take in and what they produce.",
+          "showsUp": [
+            "Choosing between hosted and self-run models.",
+            "Matching model size to task difficulty."
+          ],
+          "tradeoffs": [
+            "Larger models are more capable, slower and costlier.",
+            "A model's knowledge stops at its training cutoff."
+          ],
+          "terms": [
+            {
+              "name": "Transformers",
+              "definition": "A neural network architecture that uses attention to relate every token in a sequence to every other token.",
+              "showsUp": [
+                "Nearly all current language models.",
+                "Vision, audio and protein models built on the same design."
+              ],
+              "tradeoffs": [
+                "Attention cost grows quickly with sequence length.",
+                "No built-in memory beyond what fits in the input."
+              ]
+            },
+            {
+              "name": "Embeddings",
+              "definition": "Vectors that place text, images or other items in a space where similar meanings sit close together.",
+              "showsUp": [
+                "Semantic search, clustering and recommendations.",
+                "The retrieval step of RAG."
+              ],
+              "tradeoffs": [
+                "Vectors from different models are not comparable; changing model means re-embedding.",
+                "Similar is not the same as relevant or correct."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Training",
+          "definition": "Adjusting a model's weights on data so its outputs improve on a chosen objective.",
+          "showsUp": [
+            "Building a model, or adapting an existing one.",
+            "Deciding whether prompting alone is enough."
+          ],
+          "tradeoffs": [
+            "Data quality limits the result more than technique does.",
+            "It is slow and costly to iterate compared with changing a prompt."
+          ],
+          "terms": [
+            {
+              "name": "Fine-tuning",
+              "definition": "Continuing to train a pre-trained model on a smaller, task-specific dataset to change its behaviour.",
+              "showsUp": [
+                "Enforcing a consistent format, tone or narrow skill.",
+                "Making a small model match a large one on one task."
+              ],
+              "tradeoffs": [
+                "It teaches behaviour better than facts; use retrieval for knowledge.",
+                "You own a model version that must be re-tuned when the base changes."
+              ]
+            },
+            {
+              "name": "Evaluation",
+              "definition": "Measuring model quality on a fixed set of cases, so changes can be compared instead of judged by feel.",
+              "showsUp": [
+                "Before shipping a prompt or model change.",
+                "Regression suites built from real failures."
+              ],
+              "tradeoffs": [
+                "Automatic graders, including model graders, need checking against human judgement.",
+                "A test set you tune against stops telling you the truth."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Inference",
+          "definition": "Running a trained model to produce an output for a given input.",
+          "showsUp": [
+            "Every API call to a model.",
+            "Latency, throughput and cost planning."
+          ],
+          "tradeoffs": [
+            "Output is generated token by token, so long answers are slow answers.",
+            "Sampling settings trade consistency for variety."
+          ],
+          "terms": [
+            {
+              "name": "Tokens",
+              "definition": "The sub-word units a language model reads and writes; text is split into them before processing.",
+              "showsUp": [
+                "Pricing, rate limits and length limits.",
+                "Odd behaviour with rare words, numbers or non-English text."
+              ],
+              "tradeoffs": [
+                "Token count is not word count and differs between models.",
+                "Output tokens usually cost more than input tokens."
+              ]
+            },
+            {
+              "name": "Context window",
+              "definition": "The maximum number of tokens a model can consider at once, covering instructions, history, documents and its reply.",
+              "showsUp": [
+                "Long conversations and large documents.",
+                "Deciding what to include, summarise or retrieve."
+              ],
+              "tradeoffs": [
+                "Filling it raises cost and latency on every call.",
+                "Models attend less reliably to material buried in very long inputs."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Agents",
+          "definition": "Systems where a model decides which actions to take in a loop, using the results to choose its next step.",
+          "showsUp": [
+            "Coding assistants, research tools and workflow automation.",
+            "Tasks whose steps cannot be fixed in advance."
+          ],
+          "tradeoffs": [
+            "Errors compound across steps.",
+            "More autonomy needs tighter permissions and better logging."
+          ],
+          "terms": [
+            {
+              "name": "Tool use",
+              "definition": "Letting a model request calls to functions you define, with your code executing them and returning the results.",
+              "showsUp": [
+                "Looking up live data, running code, calling internal APIs.",
+                "Structured output via a schema."
+              ],
+              "tradeoffs": [
+                "Tool descriptions are prompts; vague ones cause wrong calls.",
+                "Tool results are untrusted input and can carry injected instructions."
+              ]
+            },
+            {
+              "name": "RAG",
+              "definition": "Retrieval-augmented generation: fetching relevant documents at request time and giving them to the model as context.",
+              "showsUp": [
+                "Question answering over private or recent documents.",
+                "Answers that need citations."
+              ],
+              "tradeoffs": [
+                "Answer quality is capped by retrieval quality.",
+                "Chunking and ranking choices matter more than the vector database."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Infrastructure",
+      "definition": "The machines, networks and automation that run software and get changes to it safely.",
+      "showsUp": [
+        "Cloud accounts, clusters and deployment pipelines.",
+        "The on-call rota."
+      ],
+      "tradeoffs": [
+        "Flexibility and operational burden rise together.",
+        "The bill is a design output, not an afterthought."
+      ],
+      "areas": [
+        {
+          "name": "Compute",
+          "definition": "Where and how code actually executes, and who manages the layers beneath it.",
+          "showsUp": [
+            "Choosing between virtual machines, containers and functions.",
+            "Capacity and scaling decisions."
+          ],
+          "tradeoffs": [
+            "More managed means less control and less to maintain.",
+            "Scaling to zero saves money and adds start-up delay."
+          ],
+          "terms": [
+            {
+              "name": "Containers",
+              "definition": "A packaged process with its dependencies, isolated by the kernel but sharing the host operating system.",
+              "showsUp": [
+                "Docker images and Kubernetes pods.",
+                "Making development, CI and production run the same thing."
+              ],
+              "tradeoffs": [
+                "Isolation is weaker than a virtual machine's.",
+                "Large images slow builds, pulls and cold starts."
+              ]
+            },
+            {
+              "name": "Serverless",
+              "definition": "Running code on demand without managing servers, billed per invocation and scaled automatically by the provider.",
+              "showsUp": [
+                "Functions behind HTTP endpoints, queues and schedules.",
+                "Spiky or low-volume workloads."
+              ],
+              "tradeoffs": [
+                "Cold starts add latency to the first request.",
+                "Time limits and no local state rule out long-running or connection-heavy work."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Networking",
+          "definition": "How requests find the right machine and travel there reliably and securely.",
+          "showsUp": [
+            "Domains, certificates, firewalls and private networks.",
+            "Problems that look like application bugs but are not."
+          ],
+          "tradeoffs": [
+            "Every hop adds latency and a failure point.",
+            "Misconfiguration tends to fail closed or wide open."
+          ],
+          "terms": [
+            {
+              "name": "DNS",
+              "definition": "The system that translates domain names into the IP addresses machines use to reach each other.",
+              "showsUp": [
+                "Pointing a domain at a host; mail and verification records.",
+                "Failover and geographic routing."
+              ],
+              "tradeoffs": [
+                "Changes spread only as fast as cached records expire.",
+                "It is a common single point of failure in large outages."
+              ]
+            },
+            {
+              "name": "Load balancing",
+              "definition": "Distributing incoming requests across several servers so no one of them is overwhelmed and failures are routed around.",
+              "showsUp": [
+                "In front of any service with more than one instance.",
+                "Zero-downtime deploys and health checks."
+              ],
+              "tradeoffs": [
+                "Sticky sessions simplify state and undermine even distribution.",
+                "A health check that is too shallow keeps sending traffic to a broken instance."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Delivery",
+          "definition": "The path a change takes from a commit to running in production, and how risk is controlled along it.",
+          "showsUp": [
+            "Build pipelines and release processes.",
+            "How quickly a fix can reach users."
+          ],
+          "tradeoffs": [
+            "Speed and safety are both products of automation, not opposites.",
+            "A slow pipeline encourages large, risky batches."
+          ],
+          "terms": [
+            {
+              "name": "CI/CD",
+              "definition": "Continuous integration and delivery: automatically building, testing and releasing every change through a repeatable pipeline.",
+              "showsUp": [
+                "GitHub Actions, GitLab CI and similar.",
+                "Merge checks and automated deploys."
+              ],
+              "tradeoffs": [
+                "Flaky tests teach people to ignore red builds.",
+                "Pipelines hold powerful credentials and need securing like production."
+              ]
+            },
+            {
+              "name": "Blue-green deploys",
+              "definition": "Running the new version beside the old one, then switching all traffic at once, with the old kept ready for rollback.",
+              "showsUp": [
+                "Releases that need instant rollback.",
+                "Its gradual cousin, the canary release."
+              ],
+              "tradeoffs": [
+                "You pay for two environments during the switch.",
+                "Database changes must work with both versions at once."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Observability",
+          "definition": "Being able to work out what a system is doing inside from the signals it emits.",
+          "showsUp": [
+            "Dashboards, alerts and incident investigation.",
+            "Answering questions you did not anticipate."
+          ],
+          "tradeoffs": [
+            "Telemetry volume becomes a significant cost.",
+            "Alerts nobody acts on train people to ignore alerts."
+          ],
+          "terms": [
+            {
+              "name": "Tracing",
+              "definition": "Following one request across every service it touches, recording the timing of each step as linked spans.",
+              "showsUp": [
+                "Finding which hop made a request slow.",
+                "OpenTelemetry instrumentation."
+              ],
+              "tradeoffs": [
+                "Context must be passed through every call, including queues.",
+                "Sampling keeps cost down and can drop the trace you needed."
+              ]
+            },
+            {
+              "name": "Metrics",
+              "definition": "Numeric measurements aggregated over time, such as request rate, error rate and latency percentiles.",
+              "showsUp": [
+                "Dashboards, alerts and service level objectives.",
+                "Capacity planning."
+              ],
+              "tradeoffs": [
+                "Averages hide the slow tail; use percentiles.",
+                "High-cardinality labels, like user IDs, blow up storage."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Security",
+      "definition": "Keeping systems and data confidential, intact and available in the presence of people trying to misuse them.",
+      "showsUp": [
+        "Design reviews, dependency updates and incident response.",
+        "Every boundary where untrusted input enters."
+      ],
+      "tradeoffs": [
+        "Controls that add too much friction get bypassed.",
+        "Attackers need one gap; defenders need to cover all of them."
+      ],
+      "areas": [
+        {
+          "name": "Identity",
+          "definition": "Knowing which person or service is acting, and limiting what that identity can reach.",
+          "showsUp": [
+            "Single sign-on, service accounts and cloud roles.",
+            "Access reviews and offboarding."
+          ],
+          "tradeoffs": [
+            "Shared accounts destroy accountability.",
+            "Permissions accumulate unless someone removes them."
+          ],
+          "terms": [
+            {
+              "name": "MFA",
+              "definition": "Multi-factor authentication: requiring a second proof, such as a device or key, in addition to a password.",
+              "showsUp": [
+                "Login for admin consoles, email and source control.",
+                "Passkeys and hardware security keys."
+              ],
+              "tradeoffs": [
+                "SMS and push prompts can be phished or approved by a tired user.",
+                "Account recovery is often the weakest path around it."
+              ]
+            },
+            {
+              "name": "Least privilege",
+              "definition": "Granting each identity only the permissions it needs for its task, and nothing more.",
+              "showsUp": [
+                "Cloud access policies and database roles.",
+                "Scoped API tokens."
+              ],
+              "tradeoffs": [
+                "Tight policies take effort to write and maintain.",
+                "Wildcard grants added to unblock someone tend to stay."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Cryptography",
+          "definition": "Mathematical techniques for keeping data secret, detecting tampering and proving who sent it.",
+          "showsUp": [
+            "HTTPS, password storage, signed tokens and disk encryption.",
+            "Anywhere data crosses a network you do not control."
+          ],
+          "tradeoffs": [
+            "Use vetted libraries; hand-rolled schemes fail in subtle ways.",
+            "Key management is harder than the algorithms."
+          ],
+          "terms": [
+            {
+              "name": "Hashing",
+              "definition": "A one-way function that maps any input to a fixed-size value, so the input cannot practically be recovered.",
+              "showsUp": [
+                "Password storage, file integrity checks and content addressing.",
+                "Git commit identifiers."
+              ],
+              "tradeoffs": [
+                "Passwords need a deliberately slow, salted hash such as Argon2 or bcrypt.",
+                "Fast general-purpose hashes are easy to brute-force."
+              ]
+            },
+            {
+              "name": "TLS",
+              "definition": "The protocol that encrypts traffic between two parties and verifies the server's identity with a certificate.",
+              "showsUp": [
+                "Every HTTPS connection.",
+                "Service-to-service calls, sometimes with certificates on both sides."
+              ],
+              "tradeoffs": [
+                "Expired certificates are a classic self-inflicted outage.",
+                "Encryption ends at the load balancer unless you extend it."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Threats",
+          "definition": "The recurring ways software is attacked, most of which abuse trust in input.",
+          "showsUp": [
+            "Vulnerability reports and penetration tests.",
+            "The OWASP Top Ten."
+          ],
+          "tradeoffs": [
+            "The same few classes account for most real incidents.",
+            "Frameworks prevent many by default until you opt out."
+          ],
+          "terms": [
+            {
+              "name": "Injection",
+              "definition": "Untrusted input being interpreted as code or commands because it was mixed into a query or instruction.",
+              "showsUp": [
+                "SQL built by string concatenation; shell commands with user input.",
+                "Prompt injection against language models."
+              ],
+              "tradeoffs": [
+                "Parameterised queries remove the SQL form entirely.",
+                "Filtering bad input is weaker than separating data from code."
+              ]
+            },
+            {
+              "name": "XSS",
+              "definition": "Cross-site scripting: an attacker's script running in another user's browser under your site's origin.",
+              "showsUp": [
+                "User content rendered as HTML without escaping.",
+                "Stolen sessions and actions taken as the victim."
+              ],
+              "tradeoffs": [
+                "Escaping must match the context: HTML, attribute, URL or script.",
+                "A content security policy limits damage; it does not replace escaping."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Defence",
+          "definition": "The practices that reduce the chance of a breach and limit the damage when one happens.",
+          "showsUp": [
+            "Design reviews, patching and incident drills.",
+            "Compliance audits."
+          ],
+          "tradeoffs": [
+            "Layered controls cost more and fail less.",
+            "Detection you never test may not work when needed."
+          ],
+          "terms": [
+            {
+              "name": "Threat modelling",
+              "definition": "Systematically asking what could go wrong in a design, who would do it and what would stop them.",
+              "showsUp": [
+                "Design reviews for new features.",
+                "Data flow diagrams with trust boundaries marked."
+              ],
+              "tradeoffs": [
+                "Done once and filed away, it goes stale with the first redesign.",
+                "A short session beats a perfect document nobody writes."
+              ]
+            },
+            {
+              "name": "Secrets management",
+              "definition": "Storing, distributing and rotating credentials so they never sit in code, images or logs.",
+              "showsUp": [
+                "Vault services and environment injection at deploy time.",
+                "Scanners that block commits containing keys."
+              ],
+              "tradeoffs": [
+                "A secret committed once is in history; rotate it, do not just delete it.",
+                "Rotation that has never been practised will break something."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Architecture",
+      "definition": "The large-scale decisions about how a system is divided and how its parts communicate.",
+      "showsUp": [
+        "Design documents and whiteboard sessions.",
+        "The things that are expensive to change later."
+      ],
+      "tradeoffs": [
+        "Every choice optimises for some qualities at the cost of others.",
+        "Team structure shapes it as much as technology does."
+      ],
+      "areas": [
+        {
+          "name": "Structure",
+          "definition": "Where the boundaries between parts of a system are drawn, and what is deployed together.",
+          "showsUp": [
+            "Repository layout and service ownership.",
+            "Deciding when to split or merge components."
+          ],
+          "tradeoffs": [
+            "Boundaries in the wrong place cost more than no boundaries.",
+            "Splitting moves complexity from code into the network."
+          ],
+          "terms": [
+            {
+              "name": "Monolith",
+              "definition": "An application built and deployed as a single unit, with modules calling each other in-process.",
+              "showsUp": [
+                "Most products at the start, and many at scale.",
+                "The modular monolith, with enforced internal boundaries."
+              ],
+              "tradeoffs": [
+                "Simple to run and refactor; one bad deploy affects everything.",
+                "Without discipline, modules become tangled."
+              ]
+            },
+            {
+              "name": "Microservices",
+              "definition": "A system split into small services that are deployed independently and communicate over the network.",
+              "showsUp": [
+                "Organisations with many teams shipping separately.",
+                "Parts with very different scaling or reliability needs."
+              ],
+              "tradeoffs": [
+                "You take on distributed-systems problems: partial failure, versioning, tracing.",
+                "Services that must deploy together are a monolith with extra latency."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Distribution",
+          "definition": "What changes when a system runs on several machines that can fail or lose contact independently.",
+          "showsUp": [
+            "Replicated databases and multi-region deployments.",
+            "Any call that crosses a network."
+          ],
+          "tradeoffs": [
+            "A timeout cannot tell you whether the other side did the work.",
+            "Clocks on different machines disagree."
+          ],
+          "terms": [
+            {
+              "name": "Consensus",
+              "definition": "Getting a group of machines to agree on a single value or ordering even when some of them fail.",
+              "showsUp": [
+                "Raft and Paxos inside etcd, ZooKeeper and many databases.",
+                "Leader election and distributed locks."
+              ],
+              "tradeoffs": [
+                "Needs a majority to be reachable, so it stops during some partitions.",
+                "Every agreed write costs network round trips."
+              ]
+            },
+            {
+              "name": "CAP theorem",
+              "definition": "During a network partition, a distributed store must give up either consistency or availability; it cannot keep both.",
+              "showsUp": [
+                "Choosing and configuring replicated databases.",
+                "Deciding what a user sees when a region is cut off."
+              ],
+              "tradeoffs": [
+                "It says nothing about normal operation, where latency is the real trade.",
+                "Real systems choose per operation, not once for the whole system."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Resilience",
+          "definition": "Designing so that the failure of one part degrades the system instead of taking it down.",
+          "showsUp": [
+            "Timeouts, retries and fallbacks.",
+            "Post-incident reviews."
+          ],
+          "tradeoffs": [
+            "Retries without limits turn a blip into an outage.",
+            "Fallback paths that are never exercised usually do not work."
+          ],
+          "terms": [
+            {
+              "name": "Idempotency",
+              "definition": "An operation that produces the same result whether it runs once or many times.",
+              "showsUp": [
+                "Payment APIs that accept an idempotency key.",
+                "Queue consumers that may receive a message twice."
+              ],
+              "tradeoffs": [
+                "You need somewhere to store the keys, and a rule for expiring them.",
+                "Retries are only safe if every step downstream is idempotent too."
+              ]
+            },
+            {
+              "name": "Circuit breaker",
+              "definition": "A wrapper that stops calling a failing dependency for a while, failing fast instead of piling up waiting requests.",
+              "showsUp": [
+                "Service clients and API gateways.",
+                "Protecting thread pools and connection limits."
+              ],
+              "tradeoffs": [
+                "Thresholds need tuning; too sensitive and it trips on noise.",
+                "You still have to decide what to return while it is open."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Patterns",
+          "definition": "Named, reusable solutions to recurring design problems, each with known costs.",
+          "showsUp": [
+            "Design discussions, as shared vocabulary.",
+            "Framework and library documentation."
+          ],
+          "tradeoffs": [
+            "A pattern applied without its problem is just complexity.",
+            "Names help communication and can hide disagreement about details."
+          ],
+          "terms": [
+            {
+              "name": "Event sourcing",
+              "definition": "Storing every change as an immutable event and deriving current state by replaying them.",
+              "showsUp": [
+                "Ledgers, audit-heavy domains and collaborative editing.",
+                "Systems that need to answer what the state was at a past time."
+              ],
+              "tradeoffs": [
+                "Event shapes are permanent, so evolving them takes care.",
+                "Reads need separately built projections, which lag behind writes."
+              ]
+            },
+            {
+              "name": "CQRS",
+              "definition": "Command query responsibility segregation: using separate models, and often separate stores, for writes and reads.",
+              "showsUp": [
+                "Read-heavy systems with complex write rules.",
+                "Alongside event sourcing, though neither requires the other."
+              ],
+              "tradeoffs": [
+                "The read side is eventually consistent with the write side.",
+                "Two models to maintain; overkill for simple record-keeping."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Craft",
+      "definition": "The everyday practices that keep code correct, understandable and safe to change.",
+      "showsUp": [
+        "Pull requests, test suites and team conventions.",
+        "How long a new joiner takes to ship."
+      ],
+      "tradeoffs": [
+        "The pay-off is long-term and easy to defer.",
+        "Practice followed as ritual loses its purpose."
+      ],
+      "areas": [
+        {
+          "name": "Testing",
+          "definition": "Running code against known expectations to catch mistakes before users do.",
+          "showsUp": [
+            "Local development and CI pipelines.",
+            "Refactoring with confidence."
+          ],
+          "tradeoffs": [
+            "Tests are code and carry maintenance cost.",
+            "Coverage measures what ran, not what was checked."
+          ],
+          "terms": [
+            {
+              "name": "Unit tests",
+              "definition": "Tests that check one small piece of logic in isolation, quickly and without external systems.",
+              "showsUp": [
+                "Pure functions, parsers and business rules.",
+                "The fast feedback loop while writing code."
+              ],
+              "tradeoffs": [
+                "Heavy mocking tests the mocks, not the behaviour.",
+                "Tests tied to implementation details break on every refactor."
+              ]
+            },
+            {
+              "name": "Integration tests",
+              "definition": "Tests that exercise several components together, including real databases, queues or HTTP boundaries.",
+              "showsUp": [
+                "API endpoints tested against a real database.",
+                "Contract checks between services."
+              ],
+              "tradeoffs": [
+                "Slower and harder to keep deterministic.",
+                "They find the bugs unit tests cannot: wiring, configuration and queries."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Version control",
+          "definition": "Recording every change to a codebase so work can be reviewed, combined and undone.",
+          "showsUp": [
+            "Git, in almost every project.",
+            "Release tagging and incident archaeology."
+          ],
+          "tradeoffs": [
+            "History is only useful if commits are coherent.",
+            "Large binary files and generated code fit poorly."
+          ],
+          "terms": [
+            {
+              "name": "Branching",
+              "definition": "Creating an independent line of commits so work can proceed without affecting the main line until merged.",
+              "showsUp": [
+                "Feature branches and pull requests.",
+                "Trunk-based development, which keeps branches very short."
+              ],
+              "tradeoffs": [
+                "Long-lived branches drift and produce painful merges.",
+                "Many release branches multiply the places a fix must land."
+              ]
+            },
+            {
+              "name": "Rebase",
+              "definition": "Replaying your commits on top of another branch's tip, producing a linear history with new commit identifiers.",
+              "showsUp": [
+                "Updating a feature branch before merging.",
+                "Interactive rebase to tidy commits before review."
+              ],
+              "tradeoffs": [
+                "Rewriting commits others have pulled causes confusion and lost work.",
+                "Conflicts are resolved commit by commit, which can repeat effort."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Quality",
+          "definition": "Keeping code readable and well-structured so the next change is as cheap as the last.",
+          "showsUp": [
+            "Code review, linting and style guides.",
+            "The speed at which a team can still move in year three."
+          ],
+          "tradeoffs": [
+            "Polish beyond what the code's lifetime justifies is waste.",
+            "Standards work only if tooling enforces them."
+          ],
+          "terms": [
+            {
+              "name": "Refactoring",
+              "definition": "Changing the internal structure of code without changing its observable behaviour.",
+              "showsUp": [
+                "Before adding a feature, to make room for it.",
+                "Extracting, renaming and removing duplication."
+              ],
+              "tradeoffs": [
+                "Without tests you cannot tell whether behaviour was preserved.",
+                "Mixing it with feature changes makes both hard to review."
+              ]
+            },
+            {
+              "name": "Code review",
+              "definition": "Having another person read a change before it merges, to catch defects and spread knowledge.",
+              "showsUp": [
+                "Pull requests and merge requests.",
+                "Onboarding, as a way to learn a codebase."
+              ],
+              "tradeoffs": [
+                "Large changes get shallow reviews; keep them small.",
+                "Slow reviews push people toward bigger batches."
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Planning",
+          "definition": "Deciding what to build, in what order, and how to release it with controlled risk.",
+          "showsUp": [
+            "Roadmaps, estimates and release plans.",
+            "Negotiation between speed now and speed later."
+          ],
+          "tradeoffs": [
+            "Estimates are forecasts and get treated as promises.",
+            "Shortcuts are loans; someone pays the interest."
+          ],
+          "terms": [
+            {
+              "name": "Tech debt",
+              "definition": "The future cost created by choosing a quicker solution now over a better one that would take longer.",
+              "showsUp": [
+                "Areas of the code everyone avoids touching.",
+                "Features that take longer each quarter."
+              ],
+              "tradeoffs": [
+                "Taken deliberately and repaid, it is a useful tool.",
+                "Untracked, it compounds until a rewrite looks tempting."
+              ]
+            },
+            {
+              "name": "Feature flags",
+              "definition": "Runtime switches that turn code paths on or off without a deploy, often per user or percentage.",
+              "showsUp": [
+                "Gradual rollouts, experiments and kill switches.",
+                "Merging unfinished work safely to the main branch."
+              ],
+              "tradeoffs": [
+                "Every flag doubles the states to test.",
+                "Flags left in after launch become dead code with live risk."
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

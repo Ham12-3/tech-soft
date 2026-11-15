@@ -1,0 +1,365 @@
+:root {
+  --h: 250;
+  --bg: oklch(0.17 0.015 260);
+  --ink: oklch(0.94 0.008 90);
+  --dim: oklch(0.7 0.015 260);
+  --faint: oklch(0.52 0.015 260);
+  --line: oklch(0.3 0.015 260);
+  --accent: oklch(0.84 0.13 var(--h));
+  --sans: "Space Grotesk", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --S: min(160vh, 96vw);
+  --cx: 8vw;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip {
+  position: absolute;
+  left: -999px;
+}
+.skip:focus {
+  left: 12px;
+  top: 12px;
+  z-index: 10;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 8px 12px;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: minmax(0, 58fr) minmax(340px, 42fr);
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ---------- wheel ---------- */
+
+.stage {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.rotor {
+  position: absolute;
+  width: var(--S);
+  height: var(--S);
+  left: calc(var(--cx) - var(--S) / 2);
+  top: calc(50% - var(--S) / 2);
+  cursor: grab;
+  will-change: transform;
+}
+.rotor:active {
+  cursor: grabbing;
+}
+.rotor svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.rotor svg:focus-visible {
+  outline: none;
+}
+.rotor svg:focus-visible .outline {
+  stroke-dasharray: 14 8;
+}
+
+.seg {
+  transition: opacity 0.2s ease-out;
+  cursor: pointer;
+}
+.seg path {
+  stroke: var(--bg);
+  stroke-width: 3;
+}
+.seg text {
+  font-family: var(--sans);
+  font-weight: 500;
+  fill: oklch(0.18 0.02 260);
+  pointer-events: none;
+  user-select: none;
+}
+.seg.is-muted {
+  opacity: 0.22;
+}
+.seg:hover {
+  opacity: 1;
+}
+.seg.d0 text {
+  font-size: 36px;
+  font-weight: 600;
+}
+.seg.d1 text {
+  font-size: 31px;
+}
+.seg.d2 text {
+  font-size: 30px;
+}
+
+.outline {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 6;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.hub {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 2;
+}
+.hub-dot {
+  fill: var(--accent);
+  transition: fill 0.3s;
+}
+
+.needle {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--cx) + var(--S) / 2 + 10px);
+  width: 0;
+  height: 0;
+  border: 7px solid transparent;
+  border-right-color: var(--accent);
+  border-left-width: 0;
+  transform: translateY(-50%);
+  transition: border-color 0.3s;
+}
+
+/* ---------- panel ---------- */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: clamp(20px, 4vh, 44px) clamp(20px, 4vw, 64px);
+  min-height: 0;
+}
+.panel > * {
+  width: 100%;
+  max-width: 31rem;
+}
+
+.panel-head {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.brand {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.brand-mark {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 4px solid var(--accent);
+  transition: border-color 0.3s;
+}
+
+.tabs {
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.tab {
+  appearance: none;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 0 0 10px;
+  color: var(--dim);
+  font: 500 13px var(--mono);
+  cursor: pointer;
+}
+.tab.is-active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+.tab:disabled {
+  color: var(--faint);
+  cursor: default;
+}
+.tab small {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.reading {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font: 12px var(--mono);
+  color: var(--faint);
+}
+.crumbs button,
+.chips button {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--dim);
+  cursor: pointer;
+}
+.crumbs button:hover,
+.chips button:hover {
+  color: var(--accent);
+}
+.crumbs .kind {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 11px;
+}
+
+.title {
+  margin: 0 0 14px;
+  font-size: clamp(34px, 4.4vw, 52px);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.definition {
+  margin: 0 0 30px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.block {
+  border-top: 1px solid var(--line);
+  padding: 14px 0 20px;
+}
+.block h2 {
+  margin: 0 0 12px;
+  font: 500 11px var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.block ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.block li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: oklch(0.88 0.008 90);
+}
+.block li span {
+  font: 11px var(--mono);
+  color: var(--faint);
+  padding-top: 4px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chips button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font: 12.5px var(--mono);
+}
+.chips button:hover {
+  border-color: var(--accent);
+}
+
+.panel-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  font: 11.5px var(--mono);
+  color: var(--faint);
+}
+kbd {
+  font: inherit;
+  color: var(--dim);
+  margin: 0 1px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 860px) {
+  :root {
+    --S: 215vw;
+    --cx: -14vw;
+  }
+  .app {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+  .stage {
+    height: 46dvh;
+    border-bottom: 1px solid var(--line);
+  }
+  .needle {
+    left: auto;
+    right: 4px;
+  }
+  .panel {
+    gap: 22px;
+  }
+  .reading {
+    overflow: visible;
+  }
+  .panel-foot span:last-child {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seg,
+  .needle,
+  .hub-dot,
+  .brand-mark {
+    transition: none;
+  }
+}

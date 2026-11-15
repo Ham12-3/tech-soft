@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stack Atlas</title>
+    <meta name="description" content="A wheel of software and AI concepts for working developers." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <a class="skip" href="#reading">Skip to definition</a>
+    <div class="app">
+      <section class="stage" id="stage" aria-label="Concept wheel">
+        <div class="rotor" id="rotor"></div>
+        <div class="needle" aria-hidden="true"></div>
+      </section>
+
+      <aside class="panel">
+        <header class="panel-head">
+          <p class="brand"><span class="brand-mark" aria-hidden="true"></span>Stack Atlas</p>
+          <nav class="tabs" aria-label="Wheels">
+            <button type="button" class="tab is-active" aria-current="true">Concepts</button>
+            <button type="button" class="tab" disabled>Tools <small>soon</small></button>
+            <button type="button" class="tab" disabled>Problems <small>soon</small></button>
+          </nav>
+        </header>
+
+        <main class="reading" id="reading" aria-live="polite"></main>
+
+        <footer class="panel-foot">
+          <span>Drag or scroll the wheel</span>
+          <span><kbd>←</kbd><kbd>→</kbd> around · <kbd>↑</kbd><kbd>↓</kbd> in / out</span>
+        </footer>
+      </aside>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
